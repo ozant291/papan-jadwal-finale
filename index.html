@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+<title></title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --bg:#070b12; --surface:#0c121e; --surface2:#0a0f19;
+  --text:#e7ecf3; --muted:#9aa6b6; --line:#223049;
+  --danger:#ff5b5b; --good:#31df6a; --info:#6cb2ff;
+}
+*{box-sizing:border-box; min-width:0}
+html,body{height:100%; width:100%; margin:0; padding:0; overflow-x:hidden;}
+body{
+  background:radial-gradient(1400px 700px at 50% -10%,#101a36 0%, #070b12 60%);
+  color:var(--text);
+  font:16px/1.5 Poppins,system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial;
+}
+.app{
+  min-height:100svh; min-height:100dvh;
+  padding:clamp(10px,2vw,18px);
+  padding-left:calc(clamp(10px,2vw,18px) + env(safe-area-inset-left,0px));
+  padding-right:calc(clamp(10px,2vw,18px) + env(safe-area-inset-right,0px));
+  display:flex;flex-direction:column;gap:clamp(8px,1.2vw,14px)
+}
+
+/* Toolbar */
+.toolbar{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:8px}
+.left-tools,.right-tools{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.center-tools{display:flex;justify-content:center}
+.tool{
+  border:1px solid var(--line);background:#0e172a;color:var(--text);
+  border-radius:12px;padding:10px 12px;cursor:pointer;max-width:100%;
+  transition:transform .08s,box-shadow .12s
+}
+.tool:active{transform:translateY(1px)}
+.brand{opacity:.7;font-weight:800;letter-spacing:.8px;white-space:nowrap}
+.tool.big{
+  font-size:clamp(16px,2.4vw,28px);font-weight:900;
+  padding:clamp(10px,1.8vw,14px) clamp(16px,2.4vw,24px);
+  border-radius:16px;background:#16233a;color:#fff;border:2px solid var(--line);
+  box-shadow:0 6px 14px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.05)
+}
+.tool.big:active{transform:scale(.98)}
+
+/* Grid kartu */
+.cards{
+  flex:1;display:grid;grid-template-columns:repeat(4,1fr);
+  grid-auto-rows:minmax(0,1fr);gap:clamp(10px,1.6vw,18px);width:100%
+}
+@media (max-width:1100px){.cards{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:560px){.cards{grid-template-columns:1fr}}
+
+/* Card */
+.card{
+  position:relative;border-radius:28px;padding:clamp(14px,1.6vw,20px);
+  background:radial-gradient(300px 140px at 50% 0%, rgba(255,255,255,.06), transparent 60%),linear-gradient(180deg,var(--surface),var(--surface2));
+  border:2px solid #1b2740;box-shadow:0 18px 40px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.04);
+  display:flex;flex-direction:column;align-items:center;min-height:0
+}
+.card.active{
+  border-color:var(--danger);
+  box-shadow:0 0 42px rgba(255,80,80,.35), 0 18px 40px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.04)
+}
+.start-time{
+  font-weight:900;font-size:clamp(16px,1.8vw,24px);color:var(--danger);
+  margin:2px 0 8px;white-space:nowrap
+}
+.start-time.off{color:#5f6b7a}
+
+/* Avatar bulat + ring */
+.avatar-wrap{position:relative;margin:6px 0 8px;width:clamp(140px,20vw,240px);height:clamp(140px,20vw,240px)}
+.ring{position:absolute;inset:0;border-radius:50%;background:conic-gradient(var(--ring-color,#223049) var(--ring-deg,0deg), #22304922 0)}
+.avatar-ring{position:absolute;inset:10px;border-radius:50%;overflow:hidden;border:6px solid #1b2740;background:#0f1a30;display:grid;place-items:center;box-shadow:inset 0 0 0 2px rgba(255,255,255,.03)}
+.avatar{width:100%;height:100%;object-fit:cover;object-position:var(--face-pos,50% 50%)}
+.card.active .avatar{animation:swayX var(--osc,2s) ease-in-out infinite alternate;will-change:transform}
+@keyframes swayX{0%{transform:translateX(-3%)}100%{transform:translateX(3%)}}
+
+/* Nama/kelas */
+.name{font-weight:900;letter-spacing:.4px;text-align:center;font-size:clamp(20px,2.5vw,36px);margin:6px 0 2px}
+.class{font-weight:800;color:#b7c3d7;margin-bottom:8px;font-size:clamp(14px,2vw,18px)}
+
+/* Tombol fisik */
+.controls{display:flex;gap:10px;margin:6px 0 12px;flex-wrap:wrap;justify-content:center}
+.icon{
+  position:relative;width:clamp(46px,5.2vw,70px);height:clamp(46px,5.2vw,70px);
+  border-radius:16px;background:linear-gradient(180deg,#1a2740,#0d1628);
+  color:var(--text);border:1px solid #22314a;display:grid;place-items:center;cursor:pointer;
+  box-shadow:0 10px 18px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.08), inset 0 -3px 8px rgba(0,0,0,.35);
+  transition:transform .08s, box-shadow .12s, filter .12s;overflow:hidden
+}
+.icon::before{content:""; position:absolute; inset:0 0 auto 0; height:40%; background:linear-gradient(180deg,rgba(255,255,255,.18),rgba(255,255,255,0))}
+.icon:hover{filter:brightness(1.06)}
+.icon:active{transform:translateY(2px); box-shadow:0 4px 10px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.04), inset 0 3px 8px rgba(0,0,0,.45)}
+.icon svg{width:60%;height:60%}
+
+/* Meter angka (tengah) */
+.metrics{width:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;margin:8px 0}
+.metric{width:100%;text-align:center}
+.label{font-size:clamp(12px,1.2vw,16px);color:var(--muted);font-weight:800;letter-spacing:.8px;margin-bottom:2px}
+.digits{
+  font-family:"Share Tech Mono", monospace;font-weight:400;font-variant-numeric:tabular-nums;
+  letter-spacing:2px;line-height:1;font-size:clamp(40px,9.5vw,108px);
+  text-shadow:0 0 8px rgba(255,255,255,.05);display:block;margin-inline:auto
+}
+.total .digits{color:var(--good)}
+.hidden{display:none}
+
+/* Overlay Jadwal */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);backdrop-filter:blur(2px);display:none;z-index:1000}
+.overlay.show{display:block}
+.sheet{position:absolute;inset:42px 20px;background:#0a0f19;border:1px solid var(--line);border-radius:18px;padding:14px;overflow:auto;display:flex;flex-direction:column;gap:10px;max-width:100%}
+.top{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.close{border:1px solid var(--line);background:#0d1628;color:var(--text);border-radius:10px;padding:6px 10px;cursor:pointer;white-space:nowrap}
+.h1{font-weight:900;font-size:clamp(34px,7.5vw,76px);text-align:center;margin:0}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
+.tab{padding:8px 12px;border-radius:10px;border:1px solid var(--line);background:#0c1628;color:#cfe2ff;font-weight:800;cursor:pointer;white-space:nowrap;transition:transform .12s ease}
+.tab.active{background:#16233a; transform:scale(1.12); font-size:clamp(18px,4.2vw,28px)}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+@media (max-width:1100px){.grid{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:560px){.grid{grid-template-columns:1fr}}
+.col{background:#0f1524;border:1px solid var(--line);border-radius:16px;padding:14px}
+.col .head{font-weight:900;text-align:center;letter-spacing:.6px;font-size:clamp(24px,4vw,42px);margin-bottom:4px}
+.col .cls{text-align:center;color:#b8c1d1;margin-bottom:10px;font-size:clamp(16px,3vw,24px);font-weight:800}
+.slot{border:1px dashed var(--line);border-radius:10px;padding:10px;margin:8px 0;background:#0b1221}
+.input{width:100%;font-size:clamp(16px,2.4vw,22px);padding:10px;border-radius:10px;border:1px solid var(--line);background:#0b1221;color:var(--text)}
+@media (max-width:560px){.sheet{inset:8px;border-radius:12px;padding:10px}.brand{display:none}}
+.footer-tools{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+.badge{padding:6px 10px;border-radius:10px;background:#0d1a30;color:#9db5d8;border:1px solid #223049}
+</style>
+</head>
+<body>
+  <div class="app">
+    <div class="toolbar">
+      <div class="left-tools">
+        <span class="brand badge">PAPAN JADWAL</span>
+        <button class="tool" id="btnFull">⛶ Fullscreen</button>
+      </div>
+      <div class="center-tools">
+        <button class="tool big" id="btnSchedule">📘 Jadwal Pelajaran</button>
+      </div>
+      <div class="right-tools">
+        <button class="tool" id="btnExport">Ekspor</button>
+        <label class="tool" style="cursor:pointer">Impor
+          <input id="importFile" type="file" accept="application/json" style="display:none">
+        </label>
+      </div>
+    </div>
+
+    <div class="cards" id="cards"></div>
+  </div>
+
+  <!-- Overlay Jadwal -->
+  <div class="overlay" id="ol">
+    <div class="sheet">
+      <div class="top">
+        <button class="close" id="olClose">Tutup ✕</button>
+        <div class="h1" id="dayTitle"></div>
+        <span class="badge" style="visibility:hidden"></span>
+      </div>
+      <div class="tabs" id="tabs"></div>
+      <div class="grid" id="schedGrid"></div>
+      <div class="footer-tools"><span class="badge">Data tersimpan & sinkron otomatis</span></div>
+    </div>
+  </div>
+
+<script>
+/* ============== SYNC (Google Apps Script) ============== */
+const SYNC_URL = "https://script.google.com/macros/s/AKfycbyyJc3pRzLL5EPnd1eKHOhlfgMZLrY6T-OY9N8Q-ocnD6ehqD8ZzneDekEXMorfzLqXsQ/exec"; // <-- ganti
+
+async function cloudLoad() {
+  if (!SYNC_URL) return;
+  try {
+    const r = await fetch(SYNC_URL + "?t=" + Date.now(), { cache: "no-store" });
+    if (!r.ok) return;
+    const j = await r.json();
+    if (!j || !Array.isArray(j.kids)) return;
+
+    // Normalisasi agar lengkap & valid
+    const normalized = normalizeKids(j.kids);
+
+    if (JSON.stringify(normalized) !== JSON.stringify(DATA)) {
+      DATA = normalized;
+      saveLocal(DATA);
+      renderCards();
+
+      // bila cloud kosong/kurang → dorong balik versi lengkap (sekali)
+      if (j.kids.length !== normalized.length) {
+        cloudSave();
+      }
+    }
+  } catch (e) {
+    console.warn("cloudLoad gagal:", e);
+  }
+}
+async function cloudSave() {
+  if (!SYNC_URL) return;
+  try {
+    await fetch(SYNC_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ kids: DATA })
+    });
+  } catch {}
+}
+
+/* ============== DATA & KONFIG ============== */
+const KIDS=["Faatih","Affan","Hana","Adel"];
+const CLASS_OF={Faatih:"KELAS VI",Affan:"KELAS IV",Hana:"KELAS I",Adel:"KELAS II"};
+const PHOTOS={Faatih:"img/fatih.jpg",Affan:"img/affan.jpg",Hana:"img/hana.jpg",Adel:"img/adel.jpg"};
+const PHOTOS_RUN={Faatih:"img/fatih_play.jpg",Affan:"img/affan_play.jpg",Hana:"img/hana_play.jpg",Adel:null};
+const FACE_POS={Faatih:"50% 42%",Affan:"50% 45%",Hana:"50% 45%",Adel:"50% 50%"};
+
+const DAY_KEYS=["Min","Sen","Sel","Rab","Kam","Jum","Sab"];
+const DAY_LABEL={Min:"Minggu",Sen:"Senin",Sel:"Selasa",Rab:"Rabu",Kam:"Kamis",Jum:"Jumat",Sab:"Sabtu"};
+const kidsForSchedule=["Faatih","Affan","Hana"];
+const HIDE_ZERO_TOTAL=true;
+
+const todayKey=()=>DAY_KEYS[new Date().getDay()];
+const todayStr=()=>new Date().toISOString().slice(0,10);
+const $=(s,r=document)=>r.querySelector(s);
+
+/* ============== STORAGE ============== */
+function defKid(n){return{
+  name:n, class:CLASS_OF[n]||"", faceY:FACE_POS[n]||"50% 50%", dailyLimitMin:120,
+  schedule:{Sen:["","","",""],Sel:["","","",""],Rab:["","","",""],Kam:["","","",""],Jum:["","","",""],Sab:["","","",""],Min:["","","",""]},
+  timer:{date:todayStr(),running:false,start:null,totalMs:0}
+}}
+function normalizeKids(arr){
+  let out = Array.isArray(arr) ? [...arr] : [];
+  KIDS.forEach(n=>{ if(!out.find(k=>k && k.name===n)) out.push(defKid(n)); });
+  out = out.map(k=>{
+    if (!k) return defKid("UNKNOWN");
+    return {
+      name: k.name,
+      class: k.class ?? (CLASS_OF[k.name]||""),
+      faceY: k.faceY ?? (FACE_POS[k.name]||"50% 50%"),
+      dailyLimitMin: typeof k.dailyLimitMin==="number" ? k.dailyLimitMin : 120,
+      schedule: k.schedule ?? {Sen:["","","",""],Sel:["","","",""],Rab:["","","",""],Kam:["","","",""],Jum:["","","",""],Sab:["","","",""],Min:["","","",""]},
+      timer: k.timer ?? {date: todayStr(), running:false, start:null, totalMs:0}
+    };
+  });
+  return out;
+}
+
+function saveLocal(d){localStorage.setItem('papan.local.v6',JSON.stringify(d))}
+function loadLocal(){try{return JSON.parse(localStorage.getItem('papan.local.v6'))}catch{return null}}
+
+let DATA = normalizeKids(loadLocal() || KIDS.map(defKid));
+saveLocal(DATA);
+
+/* ============== UTIL ============== */
+function fmtMMSS(ms){const sec=Math.max(0,Math.floor(ms/1000));const mm=Math.floor(sec/60), ss=sec%60;return `${String(mm).padStart(2,'0')}:${String(ss).padStart(2,'0')}`;}
+function fmtHHMM(ms){const s=Math.max(0,Math.floor(ms/1000));const hh=Math.floor(s/3600), mm=Math.floor((s%3600)/60);return `${String(hh).padStart(2,'0')}:${String(mm).padStart(2,'0')}`;}
+function fmtHM(d){return `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`}
+function currentPhoto(n,run){return (run&&PHOTOS_RUN[n])?PHOTOS_RUN[n]:PHOTOS[n]||placeholder(n)}
+function placeholder(n){const i=n[0].toUpperCase();return `data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><rect width='240' height='240' fill='%232a3346'/><text x='50%' y='52%' font-size='104' fill='white' text-anchor='middle' font-family='Poppins' dy='.3em'>${i}</text></svg>`}
+
+/* ============== UI & TIMER ============== */
+const cardsEl=$("#cards"); let TICK=null;
+const SVG={play:`<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>`,
+            stop:`<svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 6h12v12H6z"/></svg>`,
+           reset:`<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 6V3l-4 4 4 4V8a4 4 0 11-4 4H6a6 6 0 106-6z"/></svg>`};
+
+function renderCards(){
+  cardsEl.innerHTML="";
+  KIDS.forEach(name=>{
+    const k = DATA.find(x=>x && x.name===name) || defKid(name); // guard fallback
+
+    const run=k.timer.running, cur=run?(Date.now()-new Date(k.timer.start).getTime()):0, total=k.timer.totalMs+cur;
+    const limitMs=(k.dailyLimitMin||0)*60000, pct=limitMs>0?Math.min(1,total/limitMs):0;
+    const ringDeg=Math.round(360*pct)+'deg', ringColor=pct<.7?'#2dd4bf':(pct<.95?'#f59e0b':'#ff5b5b');
+
+    const card=document.createElement('div');
+    card.className=`card ${run?'active':''}`; card.dataset.kid=name;
+    card.innerHTML=`
+      <div class="start-time ${run?'':'off'}">${run?fmtHM(new Date(k.timer.start)):'--:--'}</div>
+      <div class="avatar-wrap" style="--ring-deg:${ringDeg};--ring-color:${ringColor}">
+        <div class="ring"></div>
+        <div class="avatar-ring" style="--face-pos:${k.faceY}">
+          <img class="avatar" src="${currentPhoto(name,run)}" alt="${name}">
+        </div>
+      </div>
+      <div class="name">${name}</div>
+      <div class="class">${k.class||''}</div>
+      <div class="controls">
+        <button class="icon" data-act="start" title="Mulai">${SVG.play}</button>
+        <button class="icon" data-act="stop"  title="Stop">${SVG.stop}</button>
+        <button class="icon" data-act="reset" title="Reset">${SVG.reset}</button>
+      </div>
+      <div class="metrics">
+        <div class="metric">
+          <div class="label">TIMER</div>
+          <div class="digits" data-cur style="min-width:5ch">${fmtMMSS(cur)}</div>
+        </div>
+        <div class="metric total ${HIDE_ZERO_TOTAL&&total===0?'hidden':''}">
+          <div class="label">TOTAL HARI INI</div>
+          <div class="digits" data-total style="min-width:5ch">${fmtHHMM(Math.min(total, 24*3600*1000))}</div>
+        </div>
+      </div>`;
+    cardsEl.appendChild(card);
+
+    card.addEventListener('click',e=>{
+      const btn=e.target.closest('.icon'); if(!btn) return;
+      btn.animate([{transform:'translateY(0)'},{transform:'translateY(2px)'}],{duration:90});
+      const act=btn.dataset.act;
+      if(act==='start') startTimer(k);
+      if(act==='stop')  stopTimer(k);
+      if(act==='reset') resetTimer(k);
+    });
+    card.querySelector('.avatar-ring').onclick=()=>toggle(k);
+  });
+  startTicker();
+}
+
+const BASE_OSC=2.0, MIN_OSC=.35, STEP=.1;
+const osc=(ms)=>`${Math.max(MIN_OSC,BASE_OSC-STEP*Math.floor(ms/60000)).toFixed(2)}s`;
+
+function toggle(k){k.timer.running?stopTimer(k):startTimer(k)}
+function startTimer(k){ if(!k.timer.running){ k.timer.running=true;k.timer.start=new Date().toISOString(); save(); renderCards(); } }
+function stopTimer(k){ if(k.timer.running){ const ms=Date.now()-new Date(k.timer.start).getTime(); k.timer.running=false;k.timer.start=null;k.timer.totalMs+=ms; save(); renderCards(); } }
+function resetTimer(k){ if(confirm(`Reset total waktu HP ${k.name}?`)){ k.timer.running=false;k.timer.start=null;k.timer.totalMs=0; save(); renderCards(); } }
+
+function startTicker(){
+  if(TICK) clearInterval(TICK);
+  TICK=setInterval(()=>{
+    const t=todayStr();
+    DATA.forEach(k=>{if(k.timer.date!==t){k.timer.date=t;k.timer.running=false;k.timer.start=null;k.timer.totalMs=0}});
+    [...cardsEl.children].forEach(card=>{
+      const name=card.dataset.kid; const k=DATA.find(x=>x && x.name===name) || defKid(name);
+      const run=k.timer.running, cur=run?(Date.now()-new Date(k.timer.start).getTime()):0, total=k.timer.totalMs+cur;
+      card.classList.toggle('active',run);
+      const st=card.querySelector('.start-time'); st.textContent=run?fmtHM(new Date(k.timer.start)):'--:--'; st.classList.toggle('off',!run);
+      card.querySelector('[data-cur]').textContent=fmtMMSS(cur);
+      const totEl=card.querySelector('.total'); totEl.querySelector('[data-total]').textContent=fmtHHMM(Math.min(total,24*3600*1000)); totEl.classList.toggle('hidden',HIDE_ZERO_TOTAL&&total===0);
+      const limitMs=(k.dailyLimitMin||0)*60000, pct=limitMs>0?Math.min(1,total/limitMs):0;
+      const ringDeg=Math.round(360*pct)+'deg', ringColor=pct<.7?'#2dd4bf':(pct<.95?'#f59e0b':'#ff5b5b');
+      card.querySelector('.avatar-wrap').style.setProperty('--ring-deg',ringDeg);
+      card.querySelector('.avatar-wrap').style.setProperty('--ring-color',ringColor);
+      const img=card.querySelector('.avatar'), want=currentPhoto(name,run);
+      if(img.src!==new URL(want,location.href).href) img.src=want;
+      if(run){ img.style.animationDuration=osc(cur); } else { img.style.animation='none'; img.offsetHeight; img.style.animation=''; }
+    });
+  },250);
+}
+
+/* ============== JADWAL (overlay) ============== */
+const ol=$("#ol"), tabs=$("#tabs"), schedGrid=$("#schedGrid"), dayTitle=$("#dayTitle");
+$("#btnSchedule").onclick=()=>openSchedule(todayKey());
+$("#olClose").onclick=()=>ol.classList.remove("show");
+
+function openSchedule(active){
+  dayTitle.textContent = DAY_LABEL[active];
+  tabs.innerHTML="";
+  DAY_KEYS.forEach(k=>{
+    const b=document.createElement('button');
+    b.className='tab'+(k===active?' active':'');
+    b.textContent=DAY_LABEL[k];
+    b.onclick=()=>openSchedule(k);
+    tabs.appendChild(b);
+  });
+  schedGrid.innerHTML="";
+  ["Faatih","Affan","Hana"].forEach(n=>{
+    const kid=DATA.find(x=>x.name===n); const list=kid.schedule[active]||[];
+    const col=document.createElement('div'); col.className='col';
+    col.innerHTML=`<div class="head">${n}</div><div class="cls">${kid.class||''}</div>
+      ${[0,1,2,3].map(i=>`<div class="slot"><input class="input" data-k="${n}" data-day="${active}" data-i="${i}" value="${list[i]||''}" placeholder="Pelajaran ${i+1}"/></div>`).join('')}`;
+    schedGrid.appendChild(col);
+  });
+  schedGrid.oninput=(e)=>{const t=e.target; if(!t.classList.contains('input'))return;
+    const kid=DATA.find(x=>x.name===t.dataset.k); kid.schedule[t.dataset.day][+t.dataset.i]=t.value; save();};
+  ol.classList.add('show');
+}
+
+/* ============== Fullscreen / Ekspor / Impor ============== */
+$("#btnFull").onclick=()=>{ if(!document.fullscreenElement) document.documentElement.requestFullscreen?.(); else document.exitFullscreen?.(); };
+$("#btnExport").onclick=()=>{ const blob=new Blob([JSON.stringify(DATA,null,2)],{type:"application/json"}); const url=URL.createObjectURL(blob); const a=document.createElement("a"); a.href=url; a.download="papan_jadwal_backup.json"; a.click(); URL.revokeObjectURL(url); };
+$("#importFile").addEventListener("change",(e)=>{const f=e.target.files?.[0]; if(!f)return; const r=new FileReader(); r.onload=()=>{ try{ DATA=normalizeKids(JSON.parse(r.result)); save(); renderCards(); alert("Impor berhasil"); }catch{ alert("File tidak valid"); } }; r.readAsText(f);});
+
+/* ============== SAVE gabungan (lokal + cloud) ============== */
+function save(){ saveLocal(DATA); cloudSave(); }
+
+/* ============== Reset otomatis tengah malam ============== */
+(function scheduleMidnight(){
+  const now=new Date(); const mid=new Date(now); mid.setHours(24,0,0,0);
+  setTimeout(()=>{ const t=todayStr(); DATA.forEach(k=>{k.timer.date=t;k.timer.running=false;k.timer.start=null;k.timer.totalMs=0;}); save(); renderCards(); scheduleMidnight(); }, mid-now);
+})();
+
+/* ============== BOOT ============== */
+(async function boot(){
+  DATA = normalizeKids(DATA);        // pastikan lengkap saat start
+  renderCards();                     // tampilkan lokal dulu
+  await cloudLoad();                 // ambil cloud (override bila ada)
+  renderCards();                     // refresh
+  setInterval(cloudLoad, 4000);      // sinkron berkala
+})();
+</script>
+</body>
+</html>
+
